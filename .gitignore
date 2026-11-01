@@ -1,0 +1,30 @@
+﻿# Credentials and secrets
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+secrets.json
+credentials.json
+
+# Logs and exports
+*.log
+*.evtx
+*.csv
+*.pcap
+*.pcapng
+
+# Local configuration
+.vscode/
+.idea/
+
+# Operating system files
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
