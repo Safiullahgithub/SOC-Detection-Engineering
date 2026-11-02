@@ -1,0 +1,29 @@
+// Detection ID: DET-001
+// Name: Suspicious Encoded PowerShell Execution
+// Platform: Microsoft Defender XDR
+// Data source: DeviceProcessEvents
+// Severity: Medium
+// MITRE ATT&CK: T1059.001 - PowerShell
+// Purpose: Find PowerShell processes launched with a Base64 encoded-command argument.
+// Investigation: Review the full command line, initiating process, user, and device
+//                timeline. Decode the argument only in an authorized analysis environment.
+// False positives: Administrative scripts and software deployment tools may use encoded
+//                  PowerShell commands. Validate the parent process and expected activity.
+// Reference: https://attack.mitre.org/techniques/T1059/001/
+
+DeviceProcessEvents
+| where Timestamp >= ago(1d)
+| where FileName in~ ("powershell.exe", "pwsh.exe")
+| where ProcessCommandLine matches regex @"(?i)(?:^|\s)-(?:enc|encodedcommand|e)\s+[a-z0-9+/=]{20,}"
+| project
+    Timestamp,
+    DeviceId,
+    ReportId,
+    DeviceName,
+    AccountName,
+    FileName,
+    ProcessCommandLine,
+    InitiatingProcessFileName,
+    InitiatingProcessCommandLine,
+    SHA1
+| order by Timestamp desc
