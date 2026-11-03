@@ -1,0 +1,34 @@
+// Detection ID: DET-002
+// Name: Office Application Spawning PowerShell
+// Platform: Microsoft Defender XDR
+// Data source: DeviceProcessEvents
+// Severity: Medium
+// MITRE ATT&CK: T1059.001 - PowerShell
+// Purpose: Find PowerShell processes started by Microsoft Office applications.
+// Investigation: Review the parent and child command lines, user, device timeline,
+//                and related email or document activity.
+// False positives: Office add-ins, macros, and approved administrative workflows can
+//                  launch PowerShell. Validate the user, parent command line, and activity.
+// Reference: https://attack.mitre.org/techniques/T1059/001/
+
+DeviceProcessEvents
+| where Timestamp >= ago(1d)
+| where FileName in~ ("powershell.exe", "pwsh.exe")
+| where InitiatingProcessFileName in~ (
+    "winword.exe",
+    "excel.exe",
+    "powerpnt.exe",
+    "outlook.exe"
+)
+| project
+    Timestamp,
+    DeviceId,
+    ReportId,
+    DeviceName,
+    AccountName,
+    FileName,
+    ProcessCommandLine,
+    InitiatingProcessFileName,
+    InitiatingProcessCommandLine,
+    SHA1
+| order by Timestamp desc
