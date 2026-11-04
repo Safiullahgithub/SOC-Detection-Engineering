@@ -5,6 +5,7 @@ All notable repository changes will be documented here.
 ## [Unreleased]
 
 ### Added
+- DET-004: Microsoft Defender XDR detection for scheduled-task creation or modification.
 - DET-002: Microsoft Defender XDR detection for Office-spawned PowerShell.
 - DET-003: Microsoft Sentinel detection for potential password spraying.
 - DET-001: Microsoft Defender XDR detection for encoded PowerShell execution.

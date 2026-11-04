@@ -1,0 +1,28 @@
+// Detection ID: DET-004
+// Name: Scheduled Task Creation or Modification
+// Platform: Microsoft Defender XDR
+// Data source: DeviceProcessEvents
+// Severity: Medium
+// MITRE ATT&CK: T1053.005 - Scheduled Task/Job: Scheduled Task
+// Purpose: Find schtasks.exe commands that create or modify a scheduled task.
+// Investigation: Review the full command line, initiating process, account, task
+//                run-as identity, action, and nearby device events.
+// False positives: Software installers, management agents, and administrators commonly
+//                  create or update scheduled tasks. Validate against approved activity.
+// Reference: https://attack.mitre.org/techniques/T1053/005/
+
+DeviceProcessEvents
+| where Timestamp >= ago(1d)
+| where FileName =~ "schtasks.exe"
+| where ProcessCommandLine matches regex @"(?i)(?:^|\s)/(?:create|change)(?:\s|$)"
+| project
+    Timestamp,
+    DeviceId,
+    ReportId,
+    DeviceName,
+    AccountName,
+    ProcessCommandLine,
+    InitiatingProcessFileName,
+    InitiatingProcessCommandLine,
+    SHA1
+| order by Timestamp desc
