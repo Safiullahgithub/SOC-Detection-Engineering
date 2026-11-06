@@ -1,0 +1,48 @@
+// Detection ID: DET-006
+// Name: Risky Entra Device Code Authentication
+// Platform: Microsoft Sentinel
+// Data source: SigninLogs
+// Severity: High
+// MITRE ATT&CK: T1528 - Steal Application Access Token
+// Purpose: Find successful device-code authentications that Microsoft Entra ID marks as risky.
+// Investigation: Validate the user, source IP and location, device, application, and resource.
+//                Review the user's sign-ins and revoke sessions or credentials if compromise is confirmed.
+// False positives: Legitimate device-code clients can be flagged as risky. Confirm with the user
+//                  and review the sign-in risk context before taking action.
+// Limitations: Requires device-code sign-ins and the IsRisky signal to be present in SigninLogs.
+// Reference: https://attack.mitre.org/techniques/T1528/
+// Reference: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/signinlogs
+// Reference: https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-device-code
+
+SigninLogs
+| where TimeGenerated >= ago(1d)
+| where AuthenticationProtocol =~ "deviceCode"
+| where ResultType == "0"
+| where IsRisky == true
+| extend
+    DeviceId = tostring(DeviceDetail.deviceId),
+    DeviceOS = tostring(DeviceDetail.operatingSystem),
+    Browser = tostring(DeviceDetail.browser),
+    City = tostring(LocationDetails.city),
+    State = tostring(LocationDetails.state),
+    CountryOrRegion = tostring(LocationDetails.countryOrRegion)
+| project
+    TimeGenerated,
+    Identity,
+    IPAddress,
+    City,
+    State,
+    CountryOrRegion,
+    AppDisplayName,
+    ResourceDisplayName,
+    AuthenticationProtocol,
+    ClientAppUsed,
+    IsInteractive,
+    IsRisky,
+    RiskDetail,
+    ConditionalAccessStatus,
+    DeviceId,
+    DeviceOS,
+    Browser,
+    CorrelationId
+| order by TimeGenerated desc

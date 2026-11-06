@@ -5,6 +5,7 @@ All notable repository changes will be documented here.
 ## [Unreleased]
 
 ### Added
+- DET-006: Microsoft Sentinel detection for successful Entra device-code authentications marked as risky.
 - DET-005: Microsoft Sentinel detection for successful Entra application and service-principal credential additions.
 - DET-004: Microsoft Defender XDR detection for scheduled-task creation or modification.
 - DET-002: Microsoft Defender XDR detection for Office-spawned PowerShell.
